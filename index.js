@@ -1,3 +1,5 @@
+import { chartData } from './data.js'; // make sure file is in the same folder
+
 document.addEventListener('DOMContentLoaded', () => {
     // this the sidebar toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -56,34 +58,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // loads mydata sets from data.php
-    async function loadCharts() {
-        try {
-            const response = await fetch('data.php');
-            if (!response.ok) throw new Error('Network response was not ok');
+    function loadCharts() {
+        // ===== Charts =====
+        createChart('salesChart', 'bar', 'Sales', chartData.sales, '#0d6efd', chartData.months);
+        createChart('usersChart', 'line', 'Users', chartData.users, '#198754', chartData.months);
 
-            const data = await response.json();
+        // ===== Stats Cards =====
+        const totalSales = chartData.sales.reduce((sum, val) => sum + val, 0);
+        const totalUsers = chartData.users.reduce((sum, val) => sum + val, 0);
+        const totalOrders = chartData.orders.reduce((sum, val) => sum + val, 0);
+        const totalRevenue = chartData.orders.reduce((sum, val, i) => sum + val * chartData.averageOrderValue[i], 0);
 
-            // Charts
-            createChart('salesChart', 'bar', 'Sales', data.sales, '#0d6efd', data.months);
-            createChart('usersChart', 'line', 'Users', data.users, '#198754', data.months);
-
-            // Stats Cards
-            const totalSales = data.sales.reduce((sum, val) => sum + val, 0);
-            const totalUsers = data.users.reduce((sum, val) => sum + val, 0);
-            const totalOrders = data.orders.reduce((sum, val) => sum + val, 0);
-            const totalRevenue = data.orders.reduce((sum, val, i) => sum + val * data.averageOrderValue[i], 0);
-
-            // Update DOM
-            document.getElementById('totalSales').textContent = `₱${totalSales.toLocaleString()}`;
-            document.getElementById('totalUsers').textContent = totalUsers.toLocaleString();
-            document.getElementById('totalOrders').textContent = totalOrders.toLocaleString();
-            document.getElementById('totalRevenue').textContent = `₱${totalRevenue.toLocaleString()}`;
-
-        } catch (err) {
-            console.error('Failed to load chart data:', err);
-        }
+        document.getElementById('totalSales').textContent = `₱${totalSales.toLocaleString()}`;
+        document.getElementById('totalUsers').textContent = totalUsers.toLocaleString();
+        document.getElementById('totalOrders').textContent = totalOrders.toLocaleString();
+        document.getElementById('totalRevenue').textContent = `₱${totalRevenue.toLocaleString()}`;
     }
 
-    // Call loadCharts
+    // Call it
     loadCharts();
 });
